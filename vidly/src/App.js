@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import "./App.css";
+import MovieComponent from "./components/movie";
 
 class App extends Component {
   render() {
     return (
       <div className="container">
-        <h1>Hello world</h1>
+        <MovieComponent />
       </div>
     );
   }
