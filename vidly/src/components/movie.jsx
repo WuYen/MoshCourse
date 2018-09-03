@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/fakeMovieService";
+import LikeBtn from "./like";
+import Like from "./common/like";
 
 class MovieTable extends Component {
   state = {
-    MovieList: getMovies()
+    MovieList: getMovies(),
+    LikeList: []
   };
 
   handleDeleteMovie = id => {
@@ -11,6 +14,16 @@ class MovieTable extends Component {
     this.setState({
       MovieList: getMovies()
     });
+  };
+
+  handleLikeClick = (movie, isLike) => {
+    var tempList = this.state.LikeList;
+    if (isLike > -1) {
+      tempList = tempList.filter(x => x !== movie._id);
+    } else {
+      tempList.push(movie._id);
+    }
+    this.setState({ LikeList: tempList });
   };
 
   ShowTable() {
@@ -27,6 +40,7 @@ class MovieTable extends Component {
                 <th scope="col">Stock</th>
                 <th scope="col">Rate</th>
                 <th scope="col" />
+                <th scope="col" />
               </tr>
             </thead>
             <tbody>
@@ -36,6 +50,13 @@ class MovieTable extends Component {
                   <td>{movie.genre.name}</td>
                   <td>{movie.numberInStock}</td>
                   <td>{movie.dailyRentalRate}</td>
+                  <td>
+                    <LikeBtn
+                      isLike={this.state.LikeList.indexOf(movie._id)}
+                      onLikeClick={this.handleLikeClick}
+                      movie={movie}
+                    />
+                  </td>
                   <td>
                     <button
                       className="btn btn-danger"
