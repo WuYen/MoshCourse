@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import LikeBtn from "./like";
-import Like from "./common/like";
 
 class MovieTable extends Component {
   state = {
