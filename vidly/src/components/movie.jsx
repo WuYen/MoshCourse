@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import LikeBtn from "./like";
+import PageBar from "./pagebar";
 
 class MovieTable extends Component {
   state = {
@@ -23,6 +24,10 @@ class MovieTable extends Component {
       tempList.push(movie._id);
     }
     this.setState({ LikeList: tempList });
+  };
+
+  PageClick = index => {
+    console.log("Page click", index);
   };
 
   ShowTable() {
@@ -76,7 +81,12 @@ class MovieTable extends Component {
   }
 
   render() {
-    return <div>{this.ShowTable()}</div>;
+    return (
+      <div>
+        {this.ShowTable()}
+        <PageBar PageClick={this.PageClick} />
+      </div>
+    );
   }
 }
 
