@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import Like from "./common/like";
 import Pagination from "./common/pagination";
+import { paginate } from "../utils/paginate";
 
 class MovieTable extends Component {
   state = {
-    MovieList: getMovies(),
+    movies: getMovies(),
     pageSize: 4,
     currentPage: 1
   };
@@ -13,77 +14,29 @@ class MovieTable extends Component {
   handleDeleteMovie = id => {
     deleteMovie(id);
     this.setState({
-      MovieList: getMovies()
+      movies: getMovies()
     });
   };
 
   handleLike = movie => {
-    const movies = [...this.state.MovieList];
+    const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
     movies[index] = { ...movies[index] };
     movies[index].liked = !movies[index].liked;
-    this.setState({ MovieList: movies });
+    this.setState({ movies: movies });
   };
-
-  ShowTable() {
-    const { length: count } = this.state.MovieList;
-    if (count > 0) {
-      return (
-        <div>
-          <p>Showing {count} movies in the database.</p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col">Title</th>
-                <th scope="col">Genre</th>
-                <th scope="col">Stock</th>
-                <th scope="col">Rate</th>
-                <th scope="col" />
-                <th scope="col" />
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.MovieList.map(movie => (
-                <tr key={movie._id}>
-                  <th scope="row">{movie.title}</th>
-                  <td>{movie.genre.name}</td>
-                  <td>{movie.numberInStock}</td>
-                  <td>{movie.dailyRentalRate}</td>
-                  <td>
-                    <Like
-                      liked={movie.liked}
-                      onClick={() => this.handleLike(movie)}
-                    />
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => this.handleDeleteMovie(movie._id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
-    } else {
-      return <p>There is no movie to display</p>;
-    }
-  }
 
   handlePageChange = page => {
     this.setState({ currentPage: page });
   };
 
   render() {
-    const { length: count } = this.state.MovieList;
-    const { pageSize, currentPage } = this.state;
-    if (this.state.MovieList.length === 0) {
+    const { length: count } = this.state.movies;
+    const { pageSize, currentPage, movies: allMovies } = this.state;
+    if (this.state.movies.length === 0) {
       return <p>There is no movie to display</p>;
     }
+    const movies = paginate(allMovies, currentPage, pageSize);
     return (
       <div>
         <p>Showing {count} movies in the database.</p>
@@ -99,7 +52,7 @@ class MovieTable extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.MovieList.map(movie => (
+            {movies.map(movie => (
               <tr key={movie._id}>
                 <th scope="row">{movie.title}</th>
                 <td>{movie.genre.name}</td>
