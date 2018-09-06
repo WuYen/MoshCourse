@@ -1,28 +1,23 @@
 import React, { Component } from "react";
+import Lodash from "lodash";
 
 class PageBar extends Component {
-  state = {
-    pageSize: 5,
-    pageCount: 3,
-    currentPage: 1
-  };
-
-  handleClick = index => {
-    this.props.PageClick(index);
-    this.setState({ currentPage: index });
-  };
   render() {
+    const pages = Lodash.range(1, this.props.totalPageCount + 1);
     return (
       <nav aria-label="Page navigation example">
         <ul className="pagination">
-          {[1, 2, 3].map(x => {
+          {pages.map(x => {
             let classes = "page-item";
-            if (x === this.state.currentPage) {
+            if (x === this.props.currentPageIndex) {
               classes += " active";
             }
             return (
               <li key={x} className={classes}>
-                <a className="page-link" onClick={() => this.handleClick(x)}>
+                <a
+                  className="page-link"
+                  onClick={() => this.props.PageClick(x)}
+                >
                   {x}
                 </a>
               </li>

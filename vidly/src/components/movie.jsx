@@ -1,19 +1,38 @@
 import React, { Component } from "react";
-import { getMovies, deleteMovie } from "../services/fakeMovieService";
+import { getMovies, deleteMovie, getMovie } from "../services/fakeMovieService";
 import LikeBtn from "./like";
 import PageBar from "./pagebar";
 
 class MovieTable extends Component {
   state = {
-    MovieList: getMovies(),
-    LikeList: []
+    MovieList: getMovies()
+      .slice(0)
+      .splice(0, 3),
+    LikeList: [],
+    pageSize: 3,
+    totalCounts: getMovies().length,
+    currentPageIndex: 1,
+    totalPageCount: Math.ceil(getMovies().length / 3)
   };
 
   handleDeleteMovie = id => {
     deleteMovie(id);
-    this.setState({
-      MovieList: getMovies()
-    });
+    console.log("length", getMovies().length);
+    let newTotalPageCount = Math.ceil(getMovies().length / 3);
+    if (this.state.currentPageIndex > newTotalPageCount) {
+      this.setState({
+        currentPageIndex: this.state.currentPageIndex - 1,
+        MovieList: this.SpliceMovie(this.state.currentPageIndex - 1),
+        totalCounts: getMovies().length,
+        totalPageCount: newTotalPageCount
+      });
+    } else {
+      this.setState({
+        MovieList: this.SpliceMovie(this.state.currentPageIndex),
+        totalCounts: getMovies().length,
+        totalPageCount: newTotalPageCount
+      });
+    }
   };
 
   handleLikeClick = (movie, isLike) => {
@@ -28,10 +47,24 @@ class MovieTable extends Component {
 
   PageClick = index => {
     console.log("Page click", index);
+
+    this.setState({
+      MovieList: this.SpliceMovie(index),
+      currentPageIndex: index
+    });
+  };
+
+  SpliceMovie = index => {
+    const pageSize = this.state.pageSize;
+    const tempList = getMovies().slice(0);
+    let skipCounts = (index - 1) * pageSize;
+    let newCurrentPageMoviex = tempList.splice(skipCounts, pageSize);
+    return newCurrentPageMoviex;
   };
 
   ShowTable() {
     const { length: count } = this.state.MovieList;
+
     if (count > 0) {
       return (
         <div>
@@ -84,7 +117,13 @@ class MovieTable extends Component {
     return (
       <div>
         {this.ShowTable()}
-        <PageBar PageClick={this.PageClick} />
+        <PageBar
+          PageClick={this.PageClick}
+          count={this.state.totalCounts}
+          pageSize={this.state.pageSize}
+          totalPageCount={this.state.totalPageCount}
+          currentPageIndex={this.state.currentPageIndex}
+        />
       </div>
     );
   }
