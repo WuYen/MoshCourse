@@ -1,36 +1,28 @@
 import React, { Component } from "react";
-import { getMovies, deleteMovie, getMovie } from "../services/fakeMovieService";
+import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import LikeBtn from "./like";
 import PageBar from "./pagebar";
 
 class MovieTable extends Component {
   state = {
-    MovieList: getMovies()
-      .slice(0)
-      .splice(0, 3),
+    MovieList: getMovies(),
     LikeList: [],
     pageSize: 3,
     totalCounts: getMovies().length,
-    currentPageIndex: 1,
-    totalPageCount: Math.ceil(getMovies().length / 3)
+    currentPageIndex: 1
   };
 
   handleDeleteMovie = id => {
     deleteMovie(id);
-    console.log("length", getMovies().length);
+    this.setState({
+      MovieList: getMovies(),
+      totalCounts: getMovies().length
+    });
+
     let newTotalPageCount = Math.ceil(getMovies().length / 3);
     if (this.state.currentPageIndex > newTotalPageCount) {
       this.setState({
-        currentPageIndex: this.state.currentPageIndex - 1,
-        MovieList: this.SpliceMovie(this.state.currentPageIndex - 1),
-        totalCounts: getMovies().length,
-        totalPageCount: newTotalPageCount
-      });
-    } else {
-      this.setState({
-        MovieList: this.SpliceMovie(this.state.currentPageIndex),
-        totalCounts: getMovies().length,
-        totalPageCount: newTotalPageCount
+        currentPageIndex: this.state.currentPageIndex - 1
       });
     }
   };
@@ -46,15 +38,12 @@ class MovieTable extends Component {
   };
 
   PageClick = index => {
-    console.log("Page click", index);
-
     this.setState({
-      MovieList: this.SpliceMovie(index),
       currentPageIndex: index
     });
   };
 
-  SpliceMovie = index => {
+  PaninateMovie = index => {
     const pageSize = this.state.pageSize;
     const tempList = getMovies().slice(0);
     let skipCounts = (index - 1) * pageSize;
@@ -64,7 +53,7 @@ class MovieTable extends Component {
 
   ShowTable() {
     const { length: count } = this.state.MovieList;
-
+    const movies = this.PaninateMovie(this.state.currentPageIndex);
     if (count > 0) {
       return (
         <div>
@@ -81,7 +70,7 @@ class MovieTable extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.state.MovieList.map(movie => (
+              {movies.map(movie => (
                 <tr key={movie._id}>
                   <th scope="row">{movie.title}</th>
                   <td>{movie.genre.name}</td>
@@ -119,9 +108,8 @@ class MovieTable extends Component {
         {this.ShowTable()}
         <PageBar
           PageClick={this.PageClick}
-          count={this.state.totalCounts}
+          totalCounts={this.state.totalCounts}
           pageSize={this.state.pageSize}
-          totalPageCount={this.state.totalPageCount}
           currentPageIndex={this.state.currentPageIndex}
         />
       </div>

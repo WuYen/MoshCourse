@@ -3,7 +3,8 @@ import Lodash from "lodash";
 
 class PageBar extends Component {
   render() {
-    const pages = Lodash.range(1, this.props.totalPageCount + 1);
+    const pagesCount = Math.ceil(this.props.totalCounts / this.props.pageSize);
+    const pages = Lodash.range(1, pagesCount + 1);
     return (
       <nav aria-label="Page navigation example">
         <ul className="pagination">

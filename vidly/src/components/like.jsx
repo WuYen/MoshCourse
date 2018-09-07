@@ -3,7 +3,7 @@ import React, { Component } from "react";
 class LikeButton extends Component {
   render() {
     let classes = "fa fa-heart";
-    if (this.props.isLike == -1) {
+    if (this.props.isLike === -1) {
       classes += "-o";
     }
     return (
