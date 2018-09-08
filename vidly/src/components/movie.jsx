@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import LikeBtn from "./like";
 import PageBar from "./pagebar";
+import ListGroup from "./listgroup";
 
 class MovieTable extends Component {
   state = {
@@ -9,20 +10,25 @@ class MovieTable extends Component {
     LikeList: [],
     pageSize: 3,
     totalCounts: getMovies().length,
-    currentPageIndex: 1
+    currentPageIndex: 1,
+    currentGenre: "0"
   };
 
   handleDeleteMovie = id => {
     deleteMovie(id);
+    let lengthMovie = getMovies()
+      .slice(0)
+      .filter(x => x.genre._id === this.state.currentGenre).length;
     this.setState({
       MovieList: getMovies(),
-      totalCounts: getMovies().length
+      totalCounts: lengthMovie
     });
 
-    let newTotalPageCount = Math.ceil(getMovies().length / 3);
+    let newTotalPageCount = Math.ceil(lengthMovie / 3);
     if (this.state.currentPageIndex > newTotalPageCount) {
       this.setState({
-        currentPageIndex: this.state.currentPageIndex - 1
+        currentPageIndex:
+          newTotalPageCount == 0 ? 1 : this.state.currentPageIndex - 1
       });
     }
   };
@@ -43,17 +49,38 @@ class MovieTable extends Component {
     });
   };
 
-  PaninateMovie = index => {
+  SetCurrentGenre = id => {
+    this.setState({
+      currentPageIndex: 1,
+      currentGenre: id,
+      totalCounts: getMovies()
+        .slice(0)
+        .filter(x => x.genre._id === id).length
+    });
+  };
+
+  PaninateMovie = (items, index) => {
     const pageSize = this.state.pageSize;
-    const tempList = getMovies().slice(0);
+    const tempList = items.slice(0);
     let skipCounts = (index - 1) * pageSize;
     let newCurrentPageMoviex = tempList.splice(skipCounts, pageSize);
     return newCurrentPageMoviex;
   };
 
+  ClassifyMovie = id => {
+    if (id === "0") {
+      return getMovies().slice(0);
+    }
+    const tempList = getMovies().slice(0);
+    const newMovies = tempList.filter(x => x.genre._id === id);
+    return newMovies;
+  };
+
   ShowTable() {
     const { length: count } = this.state.MovieList;
-    const movies = this.PaninateMovie(this.state.currentPageIndex);
+    let movies = this.ClassifyMovie(this.state.currentGenre);
+    movies = this.PaninateMovie(movies, this.state.currentPageIndex);
+
     if (count > 0) {
       return (
         <div>
@@ -104,14 +131,22 @@ class MovieTable extends Component {
 
   render() {
     return (
-      <div>
-        {this.ShowTable()}
-        <PageBar
-          PageClick={this.PageClick}
-          totalCounts={this.state.totalCounts}
-          pageSize={this.state.pageSize}
-          currentPageIndex={this.state.currentPageIndex}
-        />
+      <div className="row">
+        <div className="col-2">
+          <ListGroup
+            handleClick={this.SetCurrentGenre}
+            currentGenre={this.state.currentGenre}
+          />
+        </div>
+        <div className="col-10">
+          {this.ShowTable()}
+          <PageBar
+            PageClick={this.PageClick}
+            totalCounts={this.state.totalCounts}
+            pageSize={this.state.pageSize}
+            currentPageIndex={this.state.currentPageIndex}
+          />
+        </div>
       </div>
     );
   }
