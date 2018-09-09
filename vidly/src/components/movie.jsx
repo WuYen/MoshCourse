@@ -11,14 +11,19 @@ class MovieTable extends Component {
     pageSize: 3,
     totalCounts: getMovies().length,
     currentPageIndex: 1,
-    currentGenre: "0"
+    currentGenre: "-1"
   };
 
   handleDeleteMovie = id => {
     deleteMovie(id);
+
     let lengthMovie = getMovies()
       .slice(0)
       .filter(x => x.genre._id === this.state.currentGenre).length;
+    if (this.state.currentGenre === "-1") {
+      lengthMovie = getMovies().length;
+    }
+
     this.setState({
       MovieList: getMovies(),
       totalCounts: lengthMovie
@@ -28,7 +33,7 @@ class MovieTable extends Component {
     if (this.state.currentPageIndex > newTotalPageCount) {
       this.setState({
         currentPageIndex:
-          newTotalPageCount == 0 ? 1 : this.state.currentPageIndex - 1
+          newTotalPageCount === 0 ? 1 : this.state.currentPageIndex - 1
       });
     }
   };
@@ -57,6 +62,12 @@ class MovieTable extends Component {
         .slice(0)
         .filter(x => x.genre._id === id).length
     });
+
+    if (id === "-1") {
+      this.setState({
+        totalCounts: getMovies().length
+      });
+    }
   };
 
   PaninateMovie = (items, index) => {
@@ -68,7 +79,7 @@ class MovieTable extends Component {
   };
 
   ClassifyMovie = id => {
-    if (id === "0") {
+    if (id === "-1") {
       return getMovies().slice(0);
     }
     const tempList = getMovies().slice(0);

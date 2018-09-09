@@ -3,16 +3,18 @@ import { getGenres } from "../services/fakeGenreService";
 
 class ListGroup extends Component {
   state = {
-    Genres: getGenres()
+    Genres: []
   };
-
+  componentDidMount() {
+    const Genres = [{ _id: "-1", name: "All Genres" }, ...getGenres()];
+    this.setState({ Genres });
+  }
   render() {
-    let genres = [...this.state.Genres];
     return (
       <ul className="list-group">
-        {genres.map(genre => {
+        {this.state.Genres.map(genre => {
           let classes = "list-group-item";
-          if (genre._id == this.props.currentGenre) {
+          if (genre._id === this.props.currentGenre) {
             classes += " active";
           }
           return (
